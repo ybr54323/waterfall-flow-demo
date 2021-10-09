@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>瀑布流</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .con {
+            position: relative;
+
+        }
+
+        div>div {
+            position: absolute;
+            width: 200px;
+            transition: all .5s;
+            box-shadow: 5px 5px 10px cornflowerblue;
+
+        }
+
+        [a] {
+            height: 100px;
+        }
+
+        [b] {
+            height: 200px;
+        }
+
+        [c] {
+            height: 300px;
+        }
+
+        [btn] {
+            position: relative;
+            width: 100px;
+            height: 50px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <button btn id="refresh">刷新</button>
+    <button btn id="reflow">重排</button>
+    <div class="con"></div>
+</body>
+<script>
+    window.onload = function () {
+
+
+        var btn = document.querySelector('#reflow')
+        var rfsBtn = document.querySelector('#refresh')
+
+        var con = document.querySelector('.con')
+
+        var w = document.documentElement.clientWidth || window.innerWidth
+
+        var rowcount = ~~(w / 200)
+
+
+        var abc = ['a', 'b', 'c']
+
+        var list = randomSort(new Array(rowcount * ~~(Math.random() * 20)).fill(0).map((v, index) => {
+            var item = document.createElement('div')
+            item.setAttribute(abc[index % abc.length], "")
+            return item
+        }))
+
+
+        function appendC(init = true) {
+
+            var heightList = new Array(rowcount).fill(0)
+
+            list = randomSort(list)
+            list.forEach((item, index) => {
+
+                var h = heightList.shift()
+                var x = index % rowcount
+                var y = ~~(index / rowcount)
+
+                // #rgb
+                var cStr = new Array(3).fill(0).map(() => {
+                    return (~~(Math.random() * 256)).toString(16)
+                }).reduce((res, str) => res + str, '#')
+
+
+                var baseTf = `translate3d(${200 * x + 10 * x}px,${h + 10 * y}px,0)`
+
+                if (init) con.appendChild(item)
+                heightList.push(item.getBoundingClientRect().height + h)
+
+                item.style.transform = baseTf + 'scale(1.1)'
+                item.style.backgroundColor = cStr
+                setTimeout(() => item.style.transform = baseTf + 'scale(1)', 500)
+            })
+        }
+
+        function randomSort(list) {
+            return list.sort(() => Math.random() - 0.5)
+        }
+
+
+        btn.addEventListener('click', function () {
+            appendC(false)
+        })
+
+        rfsBtn.addEventListener('click', function () {
+            location.reload()
+        })
+
+        appendC(true)
+
+    }
+
+
+</script>
+
+</html>
