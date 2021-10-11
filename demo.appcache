@@ -1,0 +1,10 @@
+CACHE MANIFEST
+# test
+index.html
+bg.png
+
+NETWORK:
+*
+
+FALLBACK:
+/
