@@ -65,7 +65,7 @@
 
         var abc = ['a', 'b', 'c']
 
-        var list = randomSort(new Array(rowcount * ~~(Math.random() * 20)).fill(0).map((v, index) => {
+        var list = randomSort(new Array(rowcount * ~~(Math.random() * 100)).fill(0).map((v, index) => {
             var item = document.createElement('div')
             item.setAttribute(abc[index % abc.length], "")
             return item
