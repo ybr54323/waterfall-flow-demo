@@ -6,20 +6,22 @@
     <title>瀑布流</title>
     <style>
         * {
-            padding: 0;
             margin: 0;
+            padding: 0;
         }
 
         .con {
             position: relative;
-
         }
+
+        .con::after {}
 
         div>div {
             position: absolute;
             width: 200px;
             transition: all .5s;
             box-shadow: 5px 5px 10px cornflowerblue;
+
 
         }
 
@@ -39,8 +41,9 @@
             position: relative;
             width: 100px;
             height: 50px;
-
         }
+
+        html {}
     </style>
 </head>
 
@@ -57,6 +60,8 @@
         var rfsBtn = document.querySelector('#refresh')
 
         var con = document.querySelector('.con')
+        let conHeight = 0
+
 
         var w = document.documentElement.clientWidth || window.innerWidth
 
@@ -65,12 +70,11 @@
 
         var abc = ['a', 'b', 'c']
 
-        var list = randomSort(new Array(rowcount * ~~(Math.random() * 20)).fill(0).map((v, index) => {
+        var list = randomSort(new Array(rowcount * ~~(Math.random() * 100)).fill(0).map((v, index) => {
             var item = document.createElement('div')
             item.setAttribute(abc[index % abc.length], "")
             return item
         }))
-
 
         function appendC(init = true) {
 
@@ -83,6 +87,7 @@
                 var x = index % rowcount
                 var y = ~~(index / rowcount)
 
+
                 // #rgb
                 var cStr = new Array(3).fill(0).map(() => {
                     return (~~(Math.random() * 256)).toString(16)
@@ -92,11 +97,20 @@
                 var baseTf = `translate3d(${200 * x + 10 * x}px,${h + 10 * y}px,0)`
 
                 if (init) con.appendChild(item)
-                heightList.push(item.getBoundingClientRect().height + h)
+
+                var itemHeight = item.getBoundingClientRect().height
+
+                heightList.push(itemHeight + h)
+                
+                // 记录外层容器高度
+                conHeight = Math.max(conHeight, itemHeight + h + 10 * y)
 
                 item.style.transform = baseTf + 'scale(1.1)'
                 item.style.backgroundColor = cStr
-                setTimeout(() => item.style.transform = baseTf + 'scale(1)', 500)
+                setTimeout(() => {
+                    item.style.transform = baseTf + 'scale(1)'
+                }, 500)
+
             })
         }
 
@@ -114,7 +128,7 @@
         })
 
         appendC(true)
-
+        con.style.height = conHeight + 'px'
     }
 
 
