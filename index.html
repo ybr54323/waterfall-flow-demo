@@ -48,60 +48,61 @@
 </head>
 
 <body>
-    <button btn id="refresh">刷新</button>
-    <button btn id="reflow">重排</button>
+
     <div class="con"></div>
 </body>
 <script>
     window.onload = function () {
 
 
-        var btn = document.querySelector('#reflow')
-        var rfsBtn = document.querySelector('#refresh')
-
-        var con = document.querySelector('.con')
+        const con = document.querySelector('.con')
         let conHeight = 0
 
 
-        var w = document.documentElement.clientWidth || window.innerWidth
+        const w = document.documentElement.clientWidth || window.innerWidth
 
-        var rowcount = ~~(w / 200)
+        const rowcount = ~~(w / 200)
 
 
-        var abc = ['a', 'b', 'c']
+        const attrNameList = ['a', 'b', 'c']
 
-        var list = randomSort(new Array(rowcount * ~~(Math.random() * 100)).fill(0).map((v, index) => {
-            var item = document.createElement('div')
-            item.setAttribute(abc[index % abc.length], "")
-            return item
-        }))
+        const list = randomSort(generateList(rowcount))
 
-        function appendC(init = true) {
 
-            var heightList = new Array(rowcount).fill(0)
+        let heightList = new Array(rowcount).fill(0)
 
-            list = randomSort(list)
+        let page = 1
+
+        function generateList(count = rowcount) {
+            return new Array(count * ~~(Math.random() * 20)).fill(0).map((v, index) => {
+                const item = document.createElement('div')
+                item.setAttribute(attrNameList[index % attrNameList.length], "")
+                return item
+            })
+        }
+
+        function appendC(con, list, init = true) {
+
             list.forEach((item, index) => {
 
-                var h = heightList.shift()
-                var x = index % rowcount
-                var y = ~~(index / rowcount)
+                const h = heightList.shift()
+                const x = index % rowcount
+                const y = ~~(index / rowcount)
 
 
                 // #rgb
-                var cStr = new Array(3).fill(0).map(() => {
+                const cStr = new Array(3).fill(0).map(() => {
                     return (~~(Math.random() * 256)).toString(16)
                 }).reduce((res, str) => res + str, '#')
 
 
-                var baseTf = `translate3d(${200 * x + 10 * x}px,${h + 10 * y}px,0)`
+                const baseTf = `translate3d(${200 * x + 10 * x}px,${h + 10 * y}px,0)`
 
                 if (init) con.appendChild(item)
-
-                var itemHeight = item.getBoundingClientRect().height
+                const itemHeight = item.getBoundingClientRect().height
 
                 heightList.push(itemHeight + h)
-                
+
                 // 记录外层容器高度
                 conHeight = Math.max(conHeight, itemHeight + h + 10 * y)
 
@@ -117,17 +118,36 @@
         function randomSort(list) {
             return list.sort(() => Math.random() - 0.5)
         }
+        function isScrollToBtm(ele) {
+            const { scrollHeight, clientHeight, scrollTop } = ele
+            return scrollHeight - 1 <= clientHeight + scrollTop;
+        }
+        function isScrollToTop(ele) {
+            return ele.scrollTop === 0
+        }
+
+        function debounce(cb, delay = 100) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer)
+                timer = setTimeout(function () {
+                    return cb.apply(this, args)
+                }, 100)
+            }
+        }
+
+        document.addEventListener('scroll', debounce(function (e) {
+            const doc = document.documentElement
+            if (isScrollToBtm(doc)) {
+                appendC(con, generateList(rowcount), true)
+            }
+            else if (isScrollToTop(doc)) {
+                location.reload()
+            }
+        }))
 
 
-        btn.addEventListener('click', function () {
-            appendC(false)
-        })
-
-        rfsBtn.addEventListener('click', function () {
-            location.reload()
-        })
-
-        appendC(true)
+        appendC(con, list, true)
         con.style.height = conHeight + 'px'
     }
 
