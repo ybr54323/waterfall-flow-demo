@@ -14,15 +14,11 @@
             position: relative;
         }
 
-        .con::after {}
-
         div>div {
             position: absolute;
             width: 200px;
             transition: all .5s;
             box-shadow: 5px 5px 10px cornflowerblue;
-
-
         }
 
         [a] {
@@ -43,12 +39,24 @@
             height: 50px;
         }
 
-        html {}
+        [loading] {
+            margin: 0 auto;
+            animation: loading-ani 0.5s infinite;
+        }
+
+        @keyframes loading-ani {
+            from {
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
     </style>
 </head>
 
 <body>
-
     <div class="con"></div>
 </body>
 <script>
@@ -63,29 +71,24 @@
 
         const rowcount = ~~(w / 200)
 
-
         const attrNameList = ['a', 'b', 'c']
 
         const list = randomSort(generateList(rowcount))
 
-
-        let heightList = new Array(rowcount).fill(0)
-
-        let page = 1
-
         function generateList(count = rowcount) {
             return new Array(count * ~~(Math.random() * 20)).fill(0).map((v, index) => {
                 const item = document.createElement('div')
-                item.setAttribute(attrNameList[index % attrNameList.length], "")
+                item.setAttribute(attrNameList[~~(Math.random() * attrNameList.length)], "")
                 return item
             })
         }
 
         function appendC(con, sub, init = true) {
+            const heightList = new Array(rowcount).fill(0)
 
             sub.forEach((item, index) => {
 
-                const h = heightList.shift() + list.length > 0 ? ~~((list.length - 1) / rowcount) * 10 : 0;
+                const h = heightList.shift()
                 const x = index % rowcount
                 const y = ~~(index / rowcount)
 
@@ -136,10 +139,20 @@
             }
         }
 
+        function createLoading() {
+const ele = document.createElement('img')
+ele.setAttribute("loading", "")
+ele.src = "./loading.png"
+
+        }
+
         document.addEventListener('scroll', debounce(function (e) {
             const doc = document.documentElement
             if (isScrollToBtm(doc)) {
-                appendC(con, generateList(rowcount), true)
+                const tem = createLoading();
+                doc.insertBefore(, con)
+                list.push(...generateList(rowcount))
+                appendC(con, list, true)
             }
             else if (isScrollToTop(doc)) {
                 location.reload()
