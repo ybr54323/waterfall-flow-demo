@@ -81,11 +81,11 @@
             })
         }
 
-        function appendC(con, list, init = true) {
+        function appendC(con, sub, init = true) {
 
-            list.forEach((item, index) => {
+            sub.forEach((item, index) => {
 
-                const h = heightList.shift()
+                const h = heightList.shift() + list.length > 0 ? ~~((list.length - 1) / rowcount) * 10 : 0;
                 const x = index % rowcount
                 const y = ~~(index / rowcount)
 
