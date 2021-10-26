@@ -78,7 +78,7 @@
         const list = randomSort(generateList(rowcount))
 
         function generateList(count = rowcount) {
-            return new Array(count * ~~(Math.random() * 20)).fill(0).map((v, index) => {
+            return new Array(count * 10).fill(0).map((v, index) => {
                 const item = document.createElement('div')
                 item.setAttribute(attrNameList[~~(Math.random() * attrNameList.length)], "")
                 return item
