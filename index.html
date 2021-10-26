@@ -40,7 +40,6 @@
         }
 
         [loading] {
-            margin: 0 auto;
             animation: loading-ani 0.5s infinite;
         }
 
@@ -52,6 +51,9 @@
             to {
                 transform: rotate(360deg)
             }
+        }
+        body {
+            text-align: center;
         }
     </style>
 </head>
@@ -139,23 +141,33 @@
             }
         }
 
-        function createLoading() {
-const ele = document.createElement('img')
-ele.setAttribute("loading", "")
-ele.src = "./loading.png"
-
+        function createLoading(cb) {
+            const ele = document.createElement('img')
+            ele.setAttribute("loading", "")
+            ele.src = "./loading.png"
+            ele.onload = function () {
+                cb(ele)
+            }
         }
 
         document.addEventListener('scroll', debounce(function (e) {
             const doc = document.documentElement
             if (isScrollToBtm(doc)) {
-                const tem = createLoading();
-                doc.insertBefore(, con)
-                list.push(...generateList(rowcount))
-                appendC(con, list, true)
+                createLoading(function (ele) {
+                    document.body.appendChild(ele)
+                    list.push(...generateList(rowcount))
+                    appendC(con, list, true)
+                    document.body.removeChild(ele)
+                })
             }
             else if (isScrollToTop(doc)) {
-                location.reload()
+
+                createLoading(function (ele) {
+                    document.body.insertBefore(ele, con)
+                    setTimeout(function() {
+                        location.reload()
+                    }, 500)
+                })
             }
         }))
 
