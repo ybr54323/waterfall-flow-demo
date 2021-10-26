@@ -16,7 +16,6 @@
 
         div>div {
             position: absolute;
-            width: 200px;
             transition: all .5s;
             box-shadow: 5px 5px 10px cornflowerblue;
         }
@@ -68,10 +67,11 @@
         const con = document.querySelector('.con')
         let conHeight = 0
 
-
         const w = document.documentElement.clientWidth || window.innerWidth
 
-        const rowcount = ~~(w / 200)
+        const rowcount = 4
+
+        const itemWidth = ~~(w / rowcount)
 
         const attrNameList = ['a', 'b', 'c']
 
@@ -101,7 +101,7 @@
                 }).reduce((res, str) => res + str, '#')
 
 
-                const baseTf = `translate3d(${200 * x + 10 * x}px,${h + 10 * y}px,0)`
+                const baseTf = `translate3d(${itemWidth * x + 10 * x}px,${h + 10 * y}px,0)`
 
                 if (init) con.appendChild(item)
                 const itemHeight = item.getBoundingClientRect().height
@@ -111,6 +111,7 @@
                 // 记录外层容器高度
                 conHeight = Math.max(conHeight, itemHeight + h + 10 * y)
 
+                item.style.width = itemWidth + 'px'
                 item.style.transform = baseTf + 'scale(1.1)'
                 item.style.backgroundColor = cStr
                 setTimeout(() => {
