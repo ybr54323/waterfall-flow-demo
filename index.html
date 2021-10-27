@@ -10,8 +10,15 @@
             padding: 0;
         }
 
+        /* todo */
+        .loading-layer {
+
+        }
         .con {
             position: relative;
+
+            z-index: 10;
+            transition: all .2s;
         }
 
         div>div {
@@ -60,6 +67,68 @@
 <body>
     <div class="con"></div>
 </body>
+<script>
+    // 模拟移动端下滑刷新
+    var con = document.getElementById('con')
+        con.isTouching = false
+        con.setIsTouching = function(b) {
+            this.isTouching = b
+        }
+        con.getIsTouching = function() {
+            return this.isTouching
+        }
+        con.setOriginPosition = function() {
+            const {
+                x,
+                y
+            } = this.getBoundingClientRect()
+            this.beginX = x
+            this.beginY = y
+        }
+        con.setTouchBegin = function({
+            x,
+            y
+        }) {
+            this.beginTouchX = x
+            this.beginTouchY = y
+        }
+
+        con.addEventListener('touchstart', function(e) {
+            this.setIsTouching(true)
+            this.setOriginPosition()
+            const {
+                touches
+            } = e
+            const [touch] = touches
+            this.setTouchBegin({
+                x: touch.clientX,
+                y: touch.clientY
+            })
+
+        })
+        con.addEventListener('touchmove', function(e) {
+            if (!this.getIsTouching()) return
+            const {
+                touches
+            } = e
+            const [touch] = touches
+
+            const diffX = touch.clientX - this.beginTouchX
+            const diffY = touch.clientY - this.beginTouchY
+            if (diffY > 0 && diffY < 200) {
+                this.style.transform = `translate3d(0,${diffY}px, 0)`
+            }
+
+        })
+        con.addEventListener('touchend', function(e) {
+            console.log('end')
+            this.setIsTouching(false)
+            this.style.transform = `translate3d(0, ${this.beginY}px, 0)`
+
+        })
+        window._con = con
+</script>
+
 <script>
     window.onload = function () {
 
