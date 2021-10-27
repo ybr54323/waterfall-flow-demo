@@ -119,12 +119,15 @@
             }
 
             ele.addEventListener('touchstart', function (e) {
-                this.setIsTouching(true)
-                this.setOriginPosition()
+
                 const {
                     touches
                 } = e
                 const [touch] = touches
+                const { clientY } = touch
+                if (clientY > 600) return
+                this.setIsTouching(true)
+                this.setOriginPosition()
                 this.setTouchBegin({
                     x: touch.clientX,
                     y: touch.clientY
