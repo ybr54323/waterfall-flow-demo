@@ -10,11 +10,23 @@
             padding: 0;
         }
 
-        .con {
+        .layer {
+            border: none;
+            width: 100vw;
+            display: table-cell;
+            vertical-align: middle;
             position: relative;
+            height: 100px;
         }
 
-        div>div {
+        .con {
+            position: relative;
+            transform: translate3d(0, -100px, 0);
+            z-index: 10;
+            transition: all .2s;
+        }
+
+        .item {
             position: absolute;
             transition: all .5s;
             box-shadow: 5px 5px 10px cornflowerblue;
@@ -39,6 +51,7 @@
         }
 
         [loading] {
+            margin: 0 auto;
             animation: loading-ani 0.5s infinite;
         }
 
@@ -51,6 +64,7 @@
                 transform: rotate(360deg)
             }
         }
+
         body {
             text-align: center;
         }
@@ -58,13 +72,85 @@
 </head>
 
 <body>
-    <div class="con"></div>
+    <div class="con">
+        <div class="layer">
+            <img loading src="loading.png" alt="">
+        </div>
+    </div>
 </body>
+<script>
+
+</script>
+
 <script>
     window.onload = function () {
 
-
+alert('tt')
         const con = document.querySelector('.con')
+
+        // 模拟移动端下滑刷新
+        function handlePullEvent(ele) {
+            ele.isTouching = false
+            ele.setIsTouching = function (b) {
+                this.isTouching = b
+            }
+            ele.getIsTouching = function () {
+                return this.isTouching
+            }
+            ele.setOriginPosition = function () {
+                const {
+                    x,
+                    y
+                } = this.getBoundingClientRect()
+                this.beginX = x
+                this.beginY = y
+            }
+            ele.setTouchBegin = function ({
+                x,
+                y
+            }) {
+                this.beginTouchX = x
+                this.beginTouchY = y
+            }
+
+            ele.addEventListener('touchstart', function (e) {
+                this.setIsTouching(true)
+                this.setOriginPosition()
+                const {
+                    touches
+                } = e
+                const [touch] = touches
+                this.setTouchBegin({
+                    x: touch.clientX,
+                    y: touch.clientY
+                })
+
+            })
+            ele.addEventListener('touchmove', function (e) {
+                if (!this.getIsTouching()) return
+                const {
+                    touches
+                } = e
+                const [touch] = touches
+
+                const diffX = touch.clientX - this.beginTouchX
+                const diffY = touch.clientY - this.beginTouchY
+                if (diffY > 0 && diffY < 200) {
+                    this.style.transform = `translate3d(0, ${diffY - 100}px, 0)`
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 500)
+                }
+
+            })
+            ele.addEventListener('touchend', function (e) {
+                this.setIsTouching(false)
+                this.style.transform = `translate3d(0, -100px, 0)`
+            })
+            window._con = ele
+        }
+
+
         let conHeight = 0
 
         const w = document.documentElement.clientWidth || window.innerWidth
@@ -80,6 +166,7 @@
         function generateList(count = rowcount) {
             return new Array(count * 10).fill(0).map((v, index) => {
                 const item = document.createElement('div')
+                item.classList.add('item')
                 item.setAttribute(attrNameList[~~(Math.random() * attrNameList.length)], "")
                 return item
             })
@@ -112,11 +199,8 @@
                 conHeight = Math.max(conHeight, itemHeight + h + 10 * y)
 
                 item.style.width = itemWidth + 'px'
-                item.style.transform = baseTf + 'scale(1.1)'
+                item.style.transform = baseTf
                 item.style.backgroundColor = cStr
-                setTimeout(() => {
-                    item.style.transform = baseTf + 'scale(1)'
-                }, 500)
 
             })
         }
@@ -126,7 +210,7 @@
         }
         function isScrollToBtm(ele) {
             const { scrollHeight, clientHeight, scrollTop } = ele
-            return scrollHeight - 1 <= clientHeight + scrollTop;
+            return scrollHeight - 100 <= clientHeight + scrollTop;
         }
         function isScrollToTop(ele) {
             return ele.scrollTop === 0
@@ -154,6 +238,7 @@
         document.addEventListener('scroll', debounce(function (e) {
             const doc = document.documentElement
             if (isScrollToBtm(doc)) {
+                console.log('btm')
                 createLoading(function (ele) {
                     document.body.appendChild(ele)
                     list.push(...generateList(rowcount))
@@ -162,19 +247,13 @@
                 })
             }
             else if (isScrollToTop(doc)) {
-
-                createLoading(function (ele) {
-                    document.body.insertBefore(ele, con)
-                    setTimeout(function() {
-                        location.reload()
-                    }, 500)
-                })
             }
         }))
 
 
         appendC(con, list, true)
-        con.style.height = conHeight + 'px'
+        console.warn(con.getBoundingClientRect())
+        handlePullEvent(con)
     }
 
 
