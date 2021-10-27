@@ -89,6 +89,13 @@
         // 模拟移动端下滑刷新
         function handlePullEvent(ele) {
             ele.isTouching = false
+            ele.shouldReload = false
+            ele.setShouldReload = function () {
+                this.shouldReload = true
+            }
+            ele.getShoudReload = function () {
+                return this.shouldReload
+            }
             ele.setIsTouching = function (b) {
                 this.isTouching = b
             }
@@ -135,15 +142,17 @@
                 const diffY = touch.clientY - this.beginTouchY
                 if (diffY > 0 && diffY < 200) {
                     this.style.transform = `translate3d(0, ${diffY - 100}px, 0)`
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 500)
+                    this.setShouldReload()
+
                 }
 
             })
             ele.addEventListener('touchend', function (e) {
                 this.setIsTouching(false)
                 this.style.transform = `translate3d(0, -100px, 0)`
+                if (this.getShoudReload()) {
+                    window.location.reload()
+                }
             })
             window._con = ele
         }
@@ -180,11 +189,12 @@
                 const y = ~~(index / rowcount)
 
 
-                // #rgb
-                const cStr = new Array(3).fill(0).map(() => {
-                    return (~~(Math.random() * 256)).toString(16)
-                }).reduce((res, str) => res + str, '#')
-
+                if (!item.colored) {
+                    const cStr = new Array(3).fill(0).map(() => {
+                        return (~~(Math.random() * 256)).toString(16)
+                    }).reduce((res, str) => res + str, '#')
+                    item.style.backgroundColor = cStr
+                }
 
                 const baseTf = `translate3d(${itemWidth * x + 10 * x}px,${h + 10 * y}px,0)`
 
@@ -198,7 +208,7 @@
 
                 item.style.width = itemWidth + 'px'
                 item.style.transform = baseTf
-                item.style.backgroundColor = cStr
+                item.colored = true
 
             })
         }
