@@ -238,7 +238,6 @@ alert('tt')
         document.addEventListener('scroll', debounce(function (e) {
             const doc = document.documentElement
             if (isScrollToBtm(doc)) {
-                console.log('btm')
                 createLoading(function (ele) {
                     document.body.appendChild(ele)
                     list.push(...generateList(rowcount))
@@ -246,13 +245,12 @@ alert('tt')
                     document.body.removeChild(ele)
                 })
             }
-            else if (isScrollToTop(doc)) {
-            }
+            // else if (isScrollToTop(doc)) {
+            // }
         }))
 
 
         appendC(con, list, true)
-        console.warn(con.getBoundingClientRect())
         handlePullEvent(con)
     }
 
